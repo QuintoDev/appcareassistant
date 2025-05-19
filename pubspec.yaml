@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^2.1.0
+  http: ^1.1.0
+  shared_preferences: ^2.2.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -54,6 +56,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/careassistant_logo.svg
+    - assets/images/logo.svg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
