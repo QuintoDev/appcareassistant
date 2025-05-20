@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../widgets/custom_text_field.dart';
 import '../services/auth_service.dart';
+import '../services/api_service.dart';
+import '../utils/decode_user_id.dart';
 import '../screens/register_screen.dart';
+import '../screens/patient_home_screen.dart';
+import '../screens/professional_home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -64,16 +68,46 @@ class LoginScreen extends StatelessWidget {
                             );
 
                             if (success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    'Inicio de sesión exitoso',
-                                  ),
-                                  backgroundColor: const Color(0xFF2ECC71),
-                                  behavior: SnackBarBehavior.floating,
-                                  margin: const EdgeInsets.all(16),
-                                ),
+                              final userId = await decodeUserIdFromToken();
+                              final userData = await ApiService.getUserById(
+                                userId,
                               );
+
+                              final String nombre = userData['nombre'];
+
+                              if (context.mounted) {
+                                final String rol = userData['tipo'];
+
+                                if (context.mounted) {
+                                  if (rol == 'PACIENTE') {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => PatientHomeScreen(
+                                              nombre: nombre,
+                                            ),
+                                      ),
+                                    );
+                                  } else if (rol == 'PROFESIONAL_SALUD') {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => ProfessionalHomeScreen(
+                                              nombre: nombre,
+                                            ),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Rol no soportado'),
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
