@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
+import '../utils/decode_user_id.dart';
 import '../widgets/assistant_bottom_dialog.dart';
 
-class PatientHomeScreen extends StatelessWidget {
+class PatientHomeScreen extends StatefulWidget {
   final String nombre;
 
   const PatientHomeScreen({super.key, required this.nombre});
+
+  @override
+  State<PatientHomeScreen> createState() => _PatientHomeScreenState();
+}
+
+class _PatientHomeScreenState extends State<PatientHomeScreen> {
+  late Future<List<dynamic>> citas;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarCitas();
+  }
+
+  void _cargarCitas() async {
+    final userId = await decodeUserIdFromToken();
+    setState(() {
+      citas = ApiService.getAppointmentsForPatient(userId);
+    });
+  }
+
+  Color _getEstadoColor(String estado) {
+    switch (estado.toUpperCase()) {
+      case 'PENDIENTE':
+        return const Color(0xFFFFF3CD); // Amarillo suave
+      case 'CONFIRMADA':
+        return const Color(0xFFD4EDDA); // Verde suave
+      case 'CANCELADA':
+        return const Color(0xFFF8D7DA); // Rojo suave
+      default:
+        return const Color(0xFFF0F0F0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +49,6 @@ class PatientHomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Encabezado con saludo y avatar
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -32,7 +66,7 @@ class PatientHomeScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                       Text(
-                        nombre,
+                        widget.nombre,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -43,30 +77,140 @@ class PatientHomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 16),
-
-            const SizedBox(height: 16),
-
-            // Contenido
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: const [
-                  _ServiceCard(
-                    icon: Icons.home_repair_service,
-                    title: 'Fisioterapia en casa',
-                    subtitle: 'Con Laura Martínez',
-                    color: Color(0xFFDFF4FF),
-                  ),
-                  SizedBox(height: 12),
-                  _ServiceCard(
-                    icon: Icons.favorite,
-                    title: 'Cita geriátrica',
-                    subtitle: 'Con Lizeth Torres',
-                    color: Color(0xFFFFEDF1),
-                  ),
-                ],
+              child: FutureBuilder<List<dynamic>>(
+                future: citas,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  final citasList = snapshot.data!;
+                  if (citasList.isEmpty) {
+                    return const Center(
+                      child: Text('No tienes citas asignadas.'),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: citasList.length,
+                    itemBuilder: (context, index) {
+                      final cita = citasList[index];
+                      final profesional = cita['profesional'];
+                      final nombreProfesional =
+                          profesional != null
+                              ? '${profesional['nombre']} ${profesional['apellido']}'
+                              : 'Por asignar';
+                      final especialidad =
+                          profesional?['especialidad'] ?? 'Sin definir';
+                      final estado = cita['estado'] ?? '';
+                      final cardColor = _getEstadoColor(estado);
+
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          dividerColor: Colors.transparent,
+                          expansionTileTheme: ExpansionTileThemeData(
+                            backgroundColor: cardColor,
+                            collapsedBackgroundColor: cardColor,
+                          ),
+                        ),
+                        child: Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 2,
+                          child: ExpansionTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            tilePadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            title: Text(
+                                '${especialidad[0].toUpperCase()}${especialidad.substring(1).toLowerCase()} - ${estado[0].toUpperCase()}${estado.substring(1).toLowerCase()}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text('Con $nombreProfesional'),
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.calendar_today,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          'Fecha: ${cita['fecha'].toString().split("T")[0]}',
+                                        ),
+                                        const SizedBox(width: 16),
+                                        const Icon(
+                                          Icons.access_time,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text('Hora: ${cita['hora']}'),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text('Ubicación: ${cita['ubicacion']}'),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.info_outline,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Expanded(
+                                          child: Text(
+                                            'Resumen: ${cita['resumen']}',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
@@ -82,68 +226,11 @@ class PatientHomeScreen extends StatelessWidget {
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
-            builder: (_) => AssistantBottomDialog(nombre: nombre),
+            builder: (_) => AssistantBottomDialog(nombre: widget.nombre),
           );
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-
-  const _CategoryChip({required this.label, required this.selected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      label: Text(label),
-      backgroundColor: selected ? const Color(0xFF00AEBE) : Colors.grey[200],
-      labelStyle: TextStyle(color: selected ? Colors.white : Colors.black),
-    );
-  }
-}
-
-class _ServiceCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color color;
-
-  const _ServiceCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(subtitle, style: const TextStyle(fontSize: 13)),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

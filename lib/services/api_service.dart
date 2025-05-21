@@ -85,4 +85,21 @@ class ApiService {
 
     return response.statusCode == 201;
   }
+
+  static Future<List<dynamic>> getAppointmentsForPatient(String userId) async {
+    final token = await AuthService.getToken();
+    final response = await http.get(
+      Uri.parse('$_baseUrl/appointments/$userId/patient'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al obtener las citas del paciente');
+    }
+  }
 }

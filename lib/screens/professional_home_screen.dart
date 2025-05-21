@@ -261,17 +261,51 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                                         const SizedBox(height: 8),
                                         Row(
                                           children: [
-                                            const Icon(
-                                              Icons.calendar_today,
-                                              size: 16,
-                                              color: Colors.grey,
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.event,
+                                                  size: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  "Fecha: ${cita['fecha'].toString().split('T')[0]}",
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                const Icon(
+                                                  Icons.access_time,
+                                                  size: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  "Hora: ${cita['hora']}",
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              "Fecha: ${cita['fecha'].toString().split('T')[0]}",
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                              ),
+                                            const SizedBox(height: 5),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.location_on,
+                                                  size: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  "Ubicación: ${cita['ubicacion']}",
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),

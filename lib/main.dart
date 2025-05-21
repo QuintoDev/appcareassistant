@@ -18,6 +18,7 @@ class CareAssistantApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       //home: const LoginScreen(),
       home: const PatientHomeScreen(nombre: 'Usuario'), // Cambia esto para probar
+      //home: const ProfessionalHomeScreen(nombre: 'Usuario'), // Cambia esto para probar
     );
   }
 }
