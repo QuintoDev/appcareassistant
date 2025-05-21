@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 
-
 class PatientHomeScreen extends StatelessWidget {
   final String nombre;
 
@@ -11,72 +10,121 @@ class PatientHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inicio'),
-        backgroundColor: const Color(0xFF00AEBE),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('jwt_token');
-              if (context.mounted) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              }
-            },
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Center(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF00AEBE), Color(0xFFB2EBF2)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '¡Bienvenido, $nombre!',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'inter',
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Hola, $nombre',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'inter',
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.white),
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.remove('jwt_token');
+                        if (context.mounted) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LoginScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.search),
-                  label: const Text('Buscar profesionales'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0082B2),
-                    foregroundColor: Colors.white,
+              const SizedBox(height: 16),
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
-                  onPressed: () {
-                    // TODO: Navegar a búsqueda
-                  },
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.calendar_today),
-                  label: const Text('Mis citas'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF00AEBE),
-                    side: const BorderSide(color: Color(0xFF00AEBE)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.favorite_border,
+                        color: Color(0xFF00AEBE),
+                        size: 60,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        '¿Qué deseas hacer hoy?',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'inter',
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 45,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.search),
+                          label: const Text('Buscar profesionales'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0082B2),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            // TODO: Navegar a búsqueda
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 45,
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.calendar_today),
+                          label: const Text('Mis citas'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF00AEBE),
+                            side:
+                                const BorderSide(color: Color(0xFF00AEBE)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            // TODO: Navegar a mis citas
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  onPressed: () {
-                    // TODO: Navegar a mis citas
-                  },
                 ),
               ),
             ],
