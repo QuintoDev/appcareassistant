@@ -55,4 +55,34 @@ class ApiService {
     );
     return response.statusCode == 200;
   }
+
+  static Future<bool> agendarCita({
+    required String profesionalId,
+    required String fecha,
+    required String hora,
+    required String resumen,
+    required String ubicacion,
+  }) async {
+    final token = await AuthService.getToken();
+    final url = Uri.parse('$_baseUrl/appointments');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'uuidProfesionalSalud': profesionalId,
+        'fecha': fecha,
+        'hora': hora,
+        'resumen': resumen,
+        'ubicacion': ubicacion,
+      }),
+    );
+
+    print(response.body);
+
+    return response.statusCode == 201;
+  }
 }
