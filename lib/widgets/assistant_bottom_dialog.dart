@@ -4,8 +4,13 @@ import '../services/api_service.dart';
 
 class AssistantBottomDialog extends StatefulWidget {
   final String nombre;
+  final VoidCallback onAppointmentCreated;
 
-  const AssistantBottomDialog({super.key, required this.nombre});
+  const AssistantBottomDialog({
+    super.key,
+    required this.nombre,
+    required this.onAppointmentCreated,
+  });
 
   @override
   State<AssistantBottomDialog> createState() => _AssistantBottomDialogState();
@@ -32,8 +37,6 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
       widget.nombre,
     );
 
-    print(respuestaLLM);
-
     setState(() {
       respuesta = respuestaLLM;
       loading = false;
@@ -47,10 +50,7 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 30)),
     );
-
-    if (picked != null) {
-      setState(() => selectedDate = picked);
-    }
+    if (picked != null) setState(() => selectedDate = picked);
   }
 
   Future<void> seleccionarHora() async {
@@ -58,10 +58,7 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
       context: context,
       initialTime: const TimeOfDay(hour: 10, minute: 0),
     );
-
-    if (picked != null) {
-      setState(() => selectedTime = picked);
-    }
+    if (picked != null) setState(() => selectedTime = picked);
   }
 
   Future<void> agendarCita(String profesionalId) async {
@@ -91,6 +88,7 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
     );
 
     if (context.mounted) {
+      widget.onAppointmentCreated();
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -107,7 +105,7 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
 
   List<Map<String, String>> _parseProfesionalesDesdeTexto(String texto) {
     final regex = RegExp(
-      r'- \*\*(.*?)\*\* Especialidad: (.*?) ?\. Disponibilidad: \*\*(.*?)\*\*\. \[ID: (.*?)\]',
+      r'- \*\*(.*?)\*\* Especialidad: (.*?)\. Ciudad: (.*?)\. Disponibilidad: \*\*(.*?)\*\*\. \[ID: (.*?)\]\. (.*?)\n',
       dotAll: true,
     );
 
@@ -115,8 +113,10 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
       return {
         'nombre': match.group(1) ?? '',
         'especialidad': match.group(2) ?? '',
-        'disponibilidad': match.group(3) ?? '',
-        'id': match.group(4) ?? '',
+        'ciudad': match.group(3) ?? '',
+        'disponibilidad': match.group(4) ?? '',
+        'id': match.group(5) ?? '',
+        'presentacion': match.group(6)?.trim() ?? '',
       };
     }).toList();
   }
@@ -138,9 +138,19 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                 TextField(
                   controller: preguntaController,
                   decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF00AEBE)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF00AEBE), width: 2),
+                    ),
+                    
                     labelText: '¿Cómo podemos ayudarte?',
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.send),
+                      color: Color(0xFF00AEBE),
                       onPressed: enviarPregunta,
                     ),
                   ),
@@ -235,20 +245,141 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                                     color: Colors.black54,
                                   ),
                                 ),
-                                trailing: ElevatedButton(
-                                  onPressed: () => agendarCita(prof['id']!),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFEFE7F6),
-                                    foregroundColor: const Color(0xFF6200EE),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.info_outline,
+                                        color: Color(0xFF00AEBE),
+                                      ),
+                                      tooltip: 'Saber más',
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder:
+                                              (_) => AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                title: Text(
+                                                  '👩‍⚕️ ${prof['nombre']}',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                content: SingleChildScrollView(
+                                                  child: RichText(
+                                                    text: TextSpan(
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            height: 1.5,
+                                                            color:
+                                                                Colors.black87,
+                                                          ),
+                                                      children: [
+                                                        const TextSpan(
+                                                          text:
+                                                              '🩺 Especialidad: ',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              '${prof['especialidad']}\n',
+                                                        ),
+
+                                                        const TextSpan(
+                                                          text: '📍 Ciudad: ',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              '${prof['ciudad']}\n',
+                                                        ),
+
+                                                        const TextSpan(
+                                                          text:
+                                                              '📆 Disponibilidad: ',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              '${prof['disponibilidad']}\n\n',
+                                                        ),
+
+                                                        const TextSpan(
+                                                          text:
+                                                              '🧑‍💼 Sobre mí:\n',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              prof['presentacion'] ??
+                                                              'Este profesional aún no ha añadido una presentación.',
+                                                          style:
+                                                              const TextStyle(
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed:
+                                                        () => Navigator.pop(
+                                                          context,
+                                                        ),
+                                                    child: const Text('Cerrar'),
+                                                  ),
+                                                ],
+                                              ),
+                                        );
+                                      },
                                     ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
+                                    Tooltip(
+                                      message:
+                                          'Agendar cita con ${prof['nombre']}',
+                                      child: ElevatedButton(
+                                        onPressed:
+                                            () => agendarCita(prof['id']!),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFF00AEBE,
+                                          ),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              18,
+                                            ),
+                                          ),
+                                        ),
+                                        child: const Text('Agendar'),
+                                      ),
                                     ),
-                                  ),
-                                  child: const Text('Agendar'),
+                                  ],
                                 ),
                               );
                             }).toList(),

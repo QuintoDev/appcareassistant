@@ -213,6 +213,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               const SnackBar(
                                 content: Text('Registro exitoso'),
                                 backgroundColor: Color(0xFF2ECC71),
+                                behavior: SnackBarBehavior.floating,
+                                margin: EdgeInsets.all(16),
                               ),
                             );
                             Navigator.pop(context);

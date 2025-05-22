@@ -59,6 +59,32 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
     _cargarCitas();
   }
 
+  Color _getEstadoColor(String estado) {
+    switch (estado.toUpperCase()) {
+      case 'PENDIENTE':
+        return const Color(0xFFFFF3CD);
+      case 'CONFIRMADA':
+        return const Color(0xFFD4EDDA);
+      case 'CANCELADA':
+        return const Color(0xFFF8D7DA);
+      default:
+        return const Color(0xFFF0F0F0);
+    }
+  }
+
+  Color _getEstadoTextColor(String estado) {
+    switch (estado.toUpperCase()) {
+      case 'PENDIENTE':
+        return const Color(0xFF856404);
+      case 'CONFIRMADA':
+        return const Color(0xFF155724);
+      case 'CANCELADA':
+        return const Color(0xFF721C24);
+      default:
+        return Colors.black87;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +135,7 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Que gusto tenerte de vuelta',
+                              'Qué gusto tenerte de vuelta',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.black54,
@@ -131,6 +157,7 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                           Icons.logout,
                           color: Color(0xFF00AEBE),
                         ),
+                        tooltip: 'Cerrar sesión',
                         onPressed: () async {
                           final prefs = await SharedPreferences.getInstance();
                           await prefs.remove('jwt_token');
@@ -184,13 +211,16 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                         itemCount: citasList.length,
                         itemBuilder: (context, index) {
                           final cita = citasList[index];
+                          final estado = cita['estado'] ?? '';
+                          final cardColor = _getEstadoColor(estado);
+                          final estadoTextColor = _getEstadoTextColor(estado);
 
                           return Theme(
                             data: Theme.of(context).copyWith(
                               dividerColor: Colors.transparent,
-                              expansionTileTheme: const ExpansionTileThemeData(
-                                backgroundColor: Color(0xFFE0F7FA),
-                                collapsedBackgroundColor: Color(0xFFE0F7FA),
+                              expansionTileTheme: ExpansionTileThemeData(
+                                backgroundColor: cardColor,
+                                collapsedBackgroundColor: cardColor,
                               ),
                             ),
                             child: Card(
@@ -204,7 +234,7 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                                   horizontal: 16,
                                 ),
                                 title: Row(
-                                  children: const [
+                                  children: [
                                     Icon(
                                       Icons.person,
                                       color: Color(0xFF00AEBE),
@@ -214,6 +244,7 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                                       'Información de la cita',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
+                                        color: estadoTextColor,
                                       ),
                                     ),
                                   ],
@@ -222,7 +253,7 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                                   Container(
                                     width: double.infinity,
                                     decoration: const BoxDecoration(
-                                      color: Color(0xFFF0F9FA),
+                                      color: Colors.white,
                                       borderRadius: BorderRadius.only(
                                         bottomLeft: Radius.circular(15),
                                         bottomRight: Radius.circular(15),
@@ -261,51 +292,47 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                                         const SizedBox(height: 8),
                                         Row(
                                           children: [
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.event,
-                                                  size: 16,
-                                                  color: Colors.grey,
-                                                ),
-                                                const SizedBox(width: 5),
-                                                Text(
-                                                  "Fecha: ${cita['fecha'].toString().split('T')[0]}",
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 16),
-                                                const Icon(
-                                                  Icons.access_time,
-                                                  size: 16,
-                                                  color: Colors.grey,
-                                                ),
-                                                const SizedBox(width: 5),
-                                                Text(
-                                                  "Hora: ${cita['hora']}",
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                              ],
+                                            const Icon(
+                                              Icons.event,
+                                              size: 16,
+                                              color: Colors.grey,
                                             ),
-                                            const SizedBox(height: 5),
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.location_on,
-                                                  size: 16,
-                                                  color: Colors.grey,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                  "Ubicación: ${cita['ubicacion']}",
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                              ],
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              "Fecha: ${cita['fecha'].toString().split('T')[0]}",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            const Icon(
+                                              Icons.access_time,
+                                              size: 16,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              "Hora: ${cita['hora']}",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.location_on,
+                                              size: 16,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              "Ubicación: ${cita['ubicacion']}",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -318,6 +345,11 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                                               onPressed:
                                                   () =>
                                                       confirmarCita(cita['id']),
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: const Color(
+                                                  0xFF00AEBE,
+                                                ),
+                                              ),
                                               child: const Text('Aceptar'),
                                             ),
                                             const SizedBox(width: 10),
@@ -325,12 +357,10 @@ class _ProfessionalHomeScreenState extends State<ProfessionalHomeScreen> {
                                               onPressed:
                                                   () =>
                                                       rechazarCita(cita['id']),
-                                              child: const Text(
-                                                'Rechazar',
-                                                style: TextStyle(
-                                                  color: Colors.red,
-                                                ),
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.red,
                                               ),
+                                              child: const Text('Rechazar'),
                                             ),
                                           ],
                                         ),
