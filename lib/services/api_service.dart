@@ -81,8 +81,6 @@ class ApiService {
       }),
     );
 
-    print(response.body);
-
     return response.statusCode == 201;
   }
 

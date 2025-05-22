@@ -144,9 +144,12 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF00AEBE), width: 2),
+                      borderSide: const BorderSide(
+                        color: Color(0xFF00AEBE),
+                        width: 2,
+                      ),
                     ),
-                    
+
                     labelText: '¿Cómo podemos ayudarte?',
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.send),
@@ -168,7 +171,21 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                     controller: resumenController,
                     decoration: InputDecoration(
                       labelText: 'Resumen del servicio',
-                      prefixIcon: const Icon(Icons.description_outlined),
+                      prefixIcon: const Icon(
+                        Icons.description_outlined,
+                        color: Color(0xFF00AEBE),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF00AEBE)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF00AEBE),
+                          width: 2,
+                        ),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -179,7 +196,21 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                     controller: ubicacionController,
                     decoration: InputDecoration(
                       labelText: 'Ubicación del servicio',
-                      prefixIcon: const Icon(Icons.location_on_outlined),
+                      prefixIcon: const Icon(
+                        Icons.location_on_outlined,
+                        color: Color(0xFF00AEBE),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF00AEBE)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF00AEBE),
+                          width: 2,
+                        ),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -190,11 +221,15 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          icon: const Icon(Icons.calendar_today),
+                          icon: const Icon(
+                            Icons.calendar_today,
+                            color: Color(0xFF00AEBE),
+                          ),
                           label: Text(
                             selectedDate == null
                                 ? 'Seleccionar fecha'
                                 : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                            style: const TextStyle(color: Color(0xFF00AEBE)),
                           ),
                           onPressed: seleccionarFecha,
                         ),
@@ -202,11 +237,15 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton.icon(
-                          icon: const Icon(Icons.access_time),
+                          icon: const Icon(
+                            Icons.access_time,
+                            color: Color(0xFF00AEBE),
+                          ),
                           label: Text(
                             selectedTime == null
                                 ? 'Seleccionar hora'
                                 : '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(color: Color(0xFF00AEBE)),
                           ),
                           onPressed: seleccionarHora,
                         ),
@@ -239,7 +278,7 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  '${prof['especialidad']} - Disponibilidad: ${prof['disponibilidad']}',
+                                  '${prof['especialidad']}',
                                   style: const TextStyle(
                                     fontSize: 13,
                                     color: Colors.black54,

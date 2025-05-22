@@ -20,8 +20,15 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscure,
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: const Color(0xFF00AEBE)),
         labelText: label,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF00AEBE)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF00AEBE), width: 2),
+        ),
       ),
     );
   }
