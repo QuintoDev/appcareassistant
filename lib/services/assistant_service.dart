@@ -16,8 +16,6 @@ class AssistantService {
       body: jsonEncode({'pregunta': pregunta, 'usuario': usuario}),
     );
 
-    print(response.body);
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return data['respuesta'] ?? 'No se obtuvo una respuesta válida.';

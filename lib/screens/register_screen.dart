@@ -24,7 +24,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Solo PROFESIONAL
   final specialtyController = TextEditingController();
-  final availabilityController = TextEditingController();
+  final List<String> diasSemana = [
+    'Lun',
+    'Mar',
+    'Mié',
+    'Jue',
+    'Vie',
+    'Sáb',
+    'Dom',
+  ];
+  final Set<String> disponibilidadSeleccionada = {};
   final bioController = TextEditingController();
 
   String selectedRole = 'PACIENTE';
@@ -164,12 +173,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         icon: Icons.medical_services,
                         controller: specialtyController,
                       ),
-                      const SizedBox(height: 10),
-                      CustomTextField(
-                        label: 'Disponibilidad',
-                        icon: Icons.schedule,
-                        controller: availabilityController,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.schedule, color: Color(0xFF00AEBE)),
+                              SizedBox(width: 8),
+                              Text(
+                                'Disponibilidad',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            children:
+                                diasSemana.map((dia) {
+                                  final activo = disponibilidadSeleccionada
+                                      .contains(dia);
+                                  return ChoiceChip(
+                                    label: Text(dia),
+                                    selected: activo,
+                                    selectedColor: const Color(0xFF00AEBE),
+                                    labelStyle: TextStyle(
+                                      color:
+                                          activo ? Colors.white : Colors.black,
+                                    ),
+                                    onSelected: (valor) {
+                                      setState(() {
+                                        if (valor) {
+                                          disponibilidadSeleccionada.add(dia);
+                                        } else {
+                                          disponibilidadSeleccionada.remove(
+                                            dia,
+                                          );
+                                        }
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                          ),
+                        ],
                       ),
+
                       const SizedBox(height: 10),
                       CustomTextField(
                         label: 'Presentación',
@@ -202,7 +253,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             edad: ageController.text.trim(),
                             parentesco: relationshipController.text.trim(),
                             especialidad: specialtyController.text.trim(),
-                            disponibilidad: availabilityController.text.trim(),
+                            disponibilidad:
+                                disponibilidadSeleccionada.toList(), // AQUÍ
                             presentacion: bioController.text.trim(),
                           );
 

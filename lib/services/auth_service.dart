@@ -34,7 +34,7 @@ class AuthService {
     String? edad,
     String? parentesco,
     String? especialidad,
-    String? disponibilidad,
+    List<String>? disponibilidad,
     String? presentacion,
   }) async {
     final Map<String, dynamic> body = {

@@ -105,17 +105,19 @@ class _AssistantBottomDialogState extends State<AssistantBottomDialog> {
 
   List<Map<String, String>> _parseProfesionalesDesdeTexto(String texto) {
     final regex = RegExp(
-      r'- \*\*(.*?)\*\* Especialidad: (.*?)\. Ciudad: (.*?)\. Disponibilidad: \*\*(.*?)\*\*\. \[ID: (.*?)\]\. (.*?)\n',
+      r'- \*\*(.*?)\*\* Especialidad: (.*?)\. Ciudad: (.*?)\. Disponibilidad: \*\*(.*?)\*\*\. \[ID:\s*(.*?)\](?:\.?\s*(.*?))?(?=(?:- \*\*|$))',
       dotAll: true,
     );
 
-    return regex.allMatches(texto).map((match) {
+    final matches = regex.allMatches(texto);
+
+    return matches.map((match) {
       return {
-        'nombre': match.group(1) ?? '',
-        'especialidad': match.group(2) ?? '',
-        'ciudad': match.group(3) ?? '',
-        'disponibilidad': match.group(4) ?? '',
-        'id': match.group(5) ?? '',
+        'nombre': match.group(1)?.trim() ?? '',
+        'especialidad': match.group(2)?.trim() ?? '',
+        'ciudad': match.group(3)?.trim() ?? '',
+        'disponibilidad': match.group(4)?.trim() ?? '',
+        'id': match.group(5)?.trim() ?? '',
         'presentacion': match.group(6)?.trim() ?? '',
       };
     }).toList();
