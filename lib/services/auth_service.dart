@@ -6,19 +6,25 @@ class AuthService {
   static const String _baseUrl = 'http://api.careassistant.co';
 
   static Future<bool> login(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'correo': email, 'contraseña': password}),
-    );
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/auth/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'correo': email, 'contraseña': password}),
+          )
+          .timeout(const Duration(seconds: 5));
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final token = data['token'];
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('jwt_token', token);
-      return true;
-    } else {
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('jwt_token', token);
+        return true;
+      } else {
+        return false;
+      }
+    } on Exception {
       return false;
     }
   }

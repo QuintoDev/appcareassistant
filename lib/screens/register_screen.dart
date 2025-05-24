@@ -35,6 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   ];
   final Set<String> disponibilidadSeleccionada = {};
   final bioController = TextEditingController();
+  final availabilityController = TextEditingController();
 
   String selectedRole = 'PACIENTE';
 
@@ -91,18 +92,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
                             color: Color(0xFF00AEBE),
-                            width: 2,
+                            width: 1,
                           ),
                         ),
                       ),
                       items: const [
                         DropdownMenuItem(
                           value: 'PACIENTE',
-                          child: Text('Paciente'),
+                          child: Text(
+                            'Paciente',
+                            style: TextStyle(color: Color(0xFF00AEBE)),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: 'PROFESIONAL_SALUD',
-                          child: Text('Profesional'),
+                          child: Text(
+                            'Profesional',
+                            style: TextStyle(color: Color(0xFF00AEBE)),
+                          ),
                         ),
                       ],
                       onChanged: (value) {
@@ -173,52 +180,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         icon: Icons.medical_services,
                         controller: specialtyController,
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.schedule, color: Color(0xFF00AEBE)),
-                              SizedBox(width: 8),
-                              Text(
-                                'Disponibilidad',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color(0xFF00AEBE),
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(Icons.schedule, color: Color(0xFF00AEBE)),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Disponibilidad',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            children:
-                                diasSemana.map((dia) {
-                                  final activo = disponibilidadSeleccionada
-                                      .contains(dia);
-                                  return ChoiceChip(
-                                    label: Text(dia),
-                                    selected: activo,
-                                    selectedColor: const Color(0xFF00AEBE),
-                                    labelStyle: TextStyle(
-                                      color:
-                                          activo ? Colors.white : Colors.black,
-                                    ),
-                                    onSelected: (valor) {
-                                      setState(() {
-                                        if (valor) {
-                                          disponibilidadSeleccionada.add(dia);
-                                        } else {
-                                          disponibilidadSeleccionada.remove(
-                                            dia,
-                                          );
-                                        }
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                          ),
-                        ],
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children:
+                                  diasSemana.map((dia) {
+                                    final activo = disponibilidadSeleccionada
+                                        .contains(dia);
+                                    return ChoiceChip(
+                                      label: Text(dia),
+                                      selected: activo,
+                                      selectedColor: const Color(0xFF00AEBE),
+                                      labelStyle: TextStyle(
+                                        color:
+                                            activo
+                                                ? Colors.white
+                                                : Colors.black,
+                                      ),
+                                      onSelected: (valor) {
+                                        setState(() {
+                                          if (valor) {
+                                            disponibilidadSeleccionada.add(dia);
+                                          } else {
+                                            disponibilidadSeleccionada.remove(
+                                              dia,
+                                            );
+                                          }
+                                          availabilityController
+                                              .text = disponibilidadSeleccionada
+                                              .join(', ');
+                                        });
+                                      },
+                                    );
+                                  }).toList(),
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 10),
