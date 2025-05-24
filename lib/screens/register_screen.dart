@@ -269,6 +269,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             _isLoading
                                 ? null
                                 : () async {
+                                  if (firstNameController.text.isEmpty ||
+                                      lastNameController.text.isEmpty ||
+                                      emailController.text.isEmpty ||
+                                      passwordController.text.isEmpty ||
+                                      cityController.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Por favor completa todos los campos.',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                        backgroundColor: Color(0xFFFFC107),
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: EdgeInsets.all(16),
+                                      ),
+                                    );
+                                    return;
+                                  }
                                   setState(() {
                                     _isLoading = true;
                                   });
@@ -311,7 +329,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                          'Error al registrar. Verifica los datos.',
+                                          'Error al registrarse. Intente nuevamente.',
                                         ),
                                         backgroundColor: Color(0xFFE63946),
                                         behavior: SnackBarBehavior.floating,
@@ -320,8 +338,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     );
                                   }
                                 },
-
-                        child: const Text('Registrarse'),
+                        child:
+                            _isLoading
+                                ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : const Text('Registrarse'),
                       ),
                     ),
                   ],
