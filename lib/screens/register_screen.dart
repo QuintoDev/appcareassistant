@@ -10,6 +10,8 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  bool _isLoading = false;
+
   // Comunes
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -82,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         labelText: 'Te vas a registrar como:',
                         labelStyle: const TextStyle(fontSize: 14),
                         prefixIcon: const Icon(
-                          Icons.person_outline,
+                          Icons.person_pin,
                           color: Color(0xFF00AEBE),
                         ),
                         border: OutlineInputBorder(
@@ -269,48 +271,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () async {
-                          final success = await AuthService.register(
-                            nombre: firstNameController.text.trim(),
-                            apellido: lastNameController.text.trim(),
-                            correo: emailController.text.trim(),
-                            contrasena: passwordController.text.trim(),
-                            ciudad: cityController.text.trim(),
-                            rol: selectedRole,
-                            celular: phoneController.text.trim(),
-                            edad: ageController.text.trim(),
-                            parentesco: relationshipController.text.trim(),
-                            especialidad: specialtyController.text.trim(),
-                            disponibilidad:
-                                disponibilidadSeleccionada.toList(), // AQUÍ
-                            presentacion: bioController.text.trim(),
-                          );
+                        onPressed:
+                            _isLoading
+                                ? null
+                                : () async {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
 
-                          if (!context.mounted) return;
+                                  final success = await AuthService.register(
+                                    nombre: firstNameController.text.trim(),
+                                    apellido: lastNameController.text.trim(),
+                                    correo: emailController.text.trim(),
+                                    contrasena: passwordController.text.trim(),
+                                    ciudad: cityController.text.trim(),
+                                    rol: selectedRole,
+                                    celular: phoneController.text.trim(),
+                                    edad: ageController.text.trim(),
+                                    parentesco:
+                                        relationshipController.text.trim(),
+                                    especialidad:
+                                        specialtyController.text.trim(),
+                                    disponibilidad:
+                                        disponibilidadSeleccionada.toList(),
+                                    presentacion: bioController.text.trim(),
+                                  );
 
-                          if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Registro exitoso'),
-                                backgroundColor: Color(0xFF2ECC71),
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.all(16),
-                              ),
-                            );
-                            Navigator.pop(context);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Error al registrar. Verifica los datos.',
-                                ),
-                                backgroundColor: Color(0xFFE63946),
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.all(16),
-                              ),
-                            );
-                          }
-                        },
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+
+                                  if (!context.mounted) return;
+
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Registro exitoso'),
+                                        backgroundColor: Color(0xFF2ECC71),
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: EdgeInsets.all(16),
+                                      ),
+                                    );
+                                    Navigator.pop(context);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Error al registrar. Verifica los datos.',
+                                        ),
+                                        backgroundColor: Color(0xFFE63946),
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: EdgeInsets.all(16),
+                                      ),
+                                    );
+                                  }
+                                },
+
                         child: const Text('Registrarse'),
                       ),
                     ),

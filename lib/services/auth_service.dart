@@ -62,13 +62,18 @@ class AuthService {
       body['presentacion'] = presentacion;
     }
 
-    final response = await http.post(
-      Uri.parse('$_baseUrl/auth/signup'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    );
-
-    return response.statusCode == 200;
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/auth/signup'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 5));
+      return response.statusCode == 200;
+    } on Exception {
+      return false;
+    }
   }
 
   static Future<String?> getToken() async {
