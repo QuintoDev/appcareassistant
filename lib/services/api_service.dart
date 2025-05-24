@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'auth_service.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://api.careassistant.co';
+  static const String _baseUrl = 'http://api.careassistant.co:8080';
 
   static Future<dynamic> getUserById(String userId) async {
     final token = await AuthService.getToken();

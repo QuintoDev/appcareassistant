@@ -5,7 +5,7 @@ import 'auth_service.dart';
 class AssistantService {
   static Future<String> getRespuesta(String pregunta, String usuario) async {
     final token = await AuthService.getToken();
-    const String _baseUrl ='http://ia.careassistant.co';
+    const String _baseUrl ='http://ia.careassistant.co:8000';
 
     final response = await http.post(
       Uri.parse('$_baseUrl/conversations'),
