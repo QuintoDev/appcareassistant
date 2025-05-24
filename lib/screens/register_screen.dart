@@ -26,15 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Solo PROFESIONAL
   final specialtyController = TextEditingController();
-  final List<String> diasSemana = [
-    'Lun',
-    'Mar',
-    'Mié',
-    'Jue',
-    'Vie',
-    'Sáb',
-    'Dom',
-  ];
+  final List<String> diasSemana = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
   final Set<String> disponibilidadSeleccionada = {};
   final bioController = TextEditingController();
   final availabilityController = TextEditingController();
@@ -79,6 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   children: [
                     DropdownButtonFormField<String>(
+                      dropdownColor: const Color(0xFFF5F9FA),
                       value: selectedRole,
                       decoration: InputDecoration(
                         labelText: 'Te vas a registrar como:',
@@ -224,6 +217,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       label: Text(dia),
                                       selected: activo,
                                       selectedColor: const Color(0xFF00AEBE),
+                                      backgroundColor: Color(0xFFF8F6FB),
                                       labelStyle: TextStyle(
                                         color:
                                             activo
