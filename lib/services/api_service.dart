@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'auth_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://api.careassistant.co:8080';
+  static final String _baseUrl = dotenv.env['API_URL'] ?? 'http://localhost:8080';
 
   static Future<dynamic> getUserById(String userId) async {
     final token = await AuthService.getToken();

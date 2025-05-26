@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'auth_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AssistantService {
   static Future<String> getRespuesta(String pregunta, String usuario) async {
     final token = await AuthService.getToken();
-    const String _baseUrl ='http://ia.careassistant.co:8000';
+    final String _baseUrl = dotenv.env['AI_URL'] ?? 'http://localhost:8000';
 
     final response = await http.post(
       Uri.parse('$_baseUrl/conversations'),
