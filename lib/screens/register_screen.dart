@@ -269,15 +269,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             _isLoading
                                 ? null
                                 : () async {
-                                  if (firstNameController.text.isEmpty ||
-                                      lastNameController.text.isEmpty ||
-                                      emailController.text.isEmpty ||
-                                      passwordController.text.isEmpty ||
-                                      cityController.text.isEmpty) {
+                                  // Validación básica según el rol
+                                  final camposComunes = [
+                                    firstNameController.text,
+                                    lastNameController.text,
+                                    emailController.text,
+                                    passwordController.text,
+                                    cityController.text,
+                                  ];
+
+                                  final camposPaciente = [
+                                    phoneController.text,
+                                    ageController.text,
+                                    relationshipController.text,
+                                  ];
+
+                                  final camposProfesional = [
+                                    specialtyController.text,
+                                    bioController.text,
+                                  ];
+
+                                  bool camposIncompletos =
+                                      camposComunes.any(
+                                        (e) => e.trim().isEmpty,
+                                      ) ||
+                                      (selectedRole == 'PACIENTE' &&
+                                          camposPaciente.any(
+                                            (e) => e.trim().isEmpty,
+                                          )) ||
+                                      (selectedRole == 'PROFESIONAL_SALUD' &&
+                                          (camposProfesional.any(
+                                                (e) => e.trim().isEmpty,
+                                              ) ||
+                                              disponibilidadSeleccionada
+                                                  .isEmpty));
+
+                                  if (camposIncompletos) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                          'Por favor completa todos los campos.',
+                                          'Por favor completa todos los campos obligatorios.',
                                           style: TextStyle(color: Colors.black),
                                         ),
                                         backgroundColor: Color(0xFFFFC107),
@@ -287,55 +318,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     );
                                     return;
                                   }
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
 
-                                  final success = await AuthService.register(
-                                    nombre: firstNameController.text.trim(),
-                                    apellido: lastNameController.text.trim(),
-                                    correo: emailController.text.trim(),
-                                    contrasena: passwordController.text.trim(),
-                                    ciudad: cityController.text.trim(),
-                                    rol: selectedRole,
-                                    celular: phoneController.text.trim(),
-                                    edad: ageController.text.trim(),
-                                    parentesco:
-                                        relationshipController.text.trim(),
-                                    especialidad:
-                                        specialtyController.text.trim(),
-                                    disponibilidad:
-                                        disponibilidadSeleccionada.toList(),
-                                    presentacion: bioController.text.trim(),
-                                  );
+                                  setState(() => _isLoading = true);
 
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-
-                                  if (!context.mounted) return;
-
-                                  if (success) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Registro exitoso'),
-                                        backgroundColor: Color(0xFF2ECC71),
-                                        behavior: SnackBarBehavior.floating,
-                                        margin: EdgeInsets.all(16),
-                                      ),
+                                  try {
+                                    final success = await AuthService.register(
+                                      nombre: firstNameController.text.trim(),
+                                      apellido: lastNameController.text.trim(),
+                                      correo: emailController.text.trim(),
+                                      contrasena:
+                                          passwordController.text.trim(),
+                                      ciudad: cityController.text.trim(),
+                                      rol: selectedRole,
+                                      celular: phoneController.text.trim(),
+                                      edad: ageController.text.trim(),
+                                      parentesco:
+                                          relationshipController.text.trim(),
+                                      especialidad:
+                                          specialtyController.text.trim(),
+                                      disponibilidad:
+                                          disponibilidadSeleccionada.toList(),
+                                      presentacion: bioController.text.trim(),
                                     );
-                                    Navigator.pop(context);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Error al registrarse. Intente nuevamente.',
+
+                                    if (!context.mounted) return;
+
+                                    if (success) {
+                                      await Future.delayed(
+                                        const Duration(milliseconds: 300),
+                                      );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Registro exitoso'),
+                                          backgroundColor: Color(0xFF2ECC71),
+                                          behavior: SnackBarBehavior.floating,
+                                          margin: EdgeInsets.all(16),
                                         ),
-                                        backgroundColor: Color(0xFFE63946),
+                                      );
+                                      Navigator.pop(context);
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Error al registrarse. Intenta nuevamente.',
+                                          ),
+                                          backgroundColor: Color(0xFFE63946),
+                                          behavior: SnackBarBehavior.floating,
+                                          margin: EdgeInsets.all(16),
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error inesperado: $e'),
+                                        backgroundColor: Colors.red,
                                         behavior: SnackBarBehavior.floating,
-                                        margin: EdgeInsets.all(16),
+                                        margin: const EdgeInsets.all(16),
                                       ),
                                     );
+                                  } finally {
+                                    if (mounted)
+                                      setState(() => _isLoading = false);
                                   }
                                 },
                         child:

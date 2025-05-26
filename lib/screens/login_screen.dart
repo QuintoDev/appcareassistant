@@ -39,13 +39,23 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
-    final success = await AuthService.login(email, password);
+    try {
+      final success = await AuthService.login(email, password);
 
-    if (success) {
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Correo o contraseña incorrectos'),
+            backgroundColor: Color(0xFFE63946),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+          ),
+        );
+        return;
+      }
+
       final userId = await decodeUserIdFromToken();
       final userData = await ApiService.getUserById(userId);
       final String nombre = userData['nombre'];
@@ -53,12 +63,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!context.mounted) return;
 
+      await Future.delayed(const Duration(milliseconds: 300));
+
       if (rol == 'PACIENTE') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => PatientHomeScreen(nombre: nombre),
-          ),
+          MaterialPageRoute(builder: (_) => PatientHomeScreen(nombre: nombre)),
         );
       } else if (rol == 'PROFESIONAL_SALUD') {
         Navigator.pushReplacement(
@@ -69,24 +79,25 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Rol no soportado')),
+          const SnackBar(
+            content: Text('Rol no soportado'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
-    } else {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Correo o contraseña incorrectos'),
-          backgroundColor: Color(0xFFE63946),
+        SnackBar(
+          content: Text('Error inesperado: $e'),
+          backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.all(16),
+          margin: const EdgeInsets.all(16),
         ),
       );
-    }
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -146,16 +157,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           onPressed: _isLoading ? null : () => _login(context),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text('Iniciar Sesión'),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : const Text('Iniciar Sesión'),
                         ),
                       ),
                     ],
