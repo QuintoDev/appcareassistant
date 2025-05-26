@@ -13,7 +13,7 @@ class AuthService {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'correo': email, 'contraseña': password}),
           )
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -69,7 +69,7 @@ class AuthService {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode(body),
           )
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } on Exception {
       return false;

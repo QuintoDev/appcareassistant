@@ -14,7 +14,7 @@ class AssistantService {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({'pregunta': pregunta, 'usuario': usuario}),
-    );
+    ).timeout(const Duration(seconds: 10));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
